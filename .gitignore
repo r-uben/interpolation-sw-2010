@@ -4,3 +4,4 @@ src/interpolation_sw_2010/replication_materials/*
 *.DS_Store
 __pycache__
 *.log
+backup
