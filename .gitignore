@@ -3,3 +3,4 @@ src/interpolation_sw_2010/replication_materials/*
 *.npz
 *.DS_Store
 __pycache__
+*.log

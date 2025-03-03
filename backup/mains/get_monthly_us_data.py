@@ -13,7 +13,6 @@ from interpolation_sw_2010.visualization import Visualization
 from interpolation_sw_2010.validation import (
     validate_dataframe,
     validate_transformation_result,
-    validate_config,
     DataValidationError
 )
 from interpolation_sw_2010.config import Config
@@ -24,7 +23,7 @@ import logging
 from pathlib import Path
 import argparse
 import sys
-from typing import Optional, Tuple, Dict, Any
+from typing import Tuple, Dict, Any
 from tqdm import tqdm
 
 

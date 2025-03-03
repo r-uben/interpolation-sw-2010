@@ -21,6 +21,7 @@ visualization:
     time_series: [12, 8]
     distribution: [15, 10]
     boxplot: [15, 8]
+    comparison: [14, 8]
 
 logging:
   level: INFO

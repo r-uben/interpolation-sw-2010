@@ -1,13 +1,13 @@
-# Stock-Watson Interpolation
+# Stock-Watson (2010) GDP Interpolation
 
-This package implements the Stock-Watson procedure for temporal disaggregation of quarterly GDP to monthly values.
+This package implements the Stock-Watson (2010) procedure for temporal disaggregation of quarterly GDP to monthly values. It provides tools to interpolate quarterly economic data to monthly frequency using various methods, with a focus on the approach described in Stock and Watson (2010).
 
 ## Features
 
 - Load and transform economic data from Excel files
-- Apply cubic spline detrending
-- Construct regressors for Stock-Watson interpolation
-- Generate visualizations of the data
+- Apply cubic spline and linear interpolation methods
+- Implement the Stock-Watson (2010) Kalman filter interpolation method
+- Generate comparison visualizations between quarterly and monthly data
 - Configurable via YAML configuration files
 - Comprehensive data validation
 - Progress tracking and logging
@@ -34,91 +34,61 @@ poetry install
 
 ## Usage
 
-The package provides a command-line interface for data transformation:
+The package provides a command-line interface for interpolating quarterly GDP data to monthly frequency:
 
 ```bash
 # Activate the poetry environment
 poetry shell
 
-# Basic usage
-get-monthly-us-data --input data/raw_data.xlsx --output data/transformed_data.xlsx
+# Run the Stock-Watson GDP interpolator
+poetry run sw2010-gdp-interpolator
 
-# With all options
-get-monthly-us-data \
-    --input data/raw_data.xlsx \
-    --output data/transformed_data.xlsx \
-    --debug \
-    --visualize \
-    --detrend \
-    --regressors
+# Or directly from the script
+poetry run python mains/sw2010_gdp_interpolator.py
 ```
 
-### Command-line Options
+### Interpolation Methods
 
-- `--input`, `-i`: Path to input Excel file with Monthly and Quarterly sheets
-- `--output`, `-o`: Path to output Excel file
-- `--debug`, `-d`: Enable debug output
-- `--visualize`, `-v`: Generate visualizations of the transformed data
-- `--detrend`, `-t`: Apply cubic spline detrending to the data
-- `--regressors`, `-r`: Construct regressors for Stock-Watson interpolation
+The package supports multiple interpolation methods:
 
-### Configuration
+1. **Cubic Spline Interpolation**: Uses scipy's cubic spline interpolation to generate monthly values from quarterly data.
+2. **Linear Interpolation**: Uses linear interpolation between quarterly data points.
+3. **Kalman Filter Interpolation**: Implements the Stock-Watson (2010) approach using a state-space model and Kalman filter.
 
-The package can be configured via a YAML file located at `src/interpolation_sw_2010/config.yaml`. If the file doesn't exist, it will be created with default values.
+### Data Requirements
 
-Example configuration:
+The input data should be in Excel format with the following structure:
+- Quarterly sheet with GDP components (PCE, I_NS, I_ES, I_RS, I_chPI, X, IM, G, PGDP)
+- Monthly sheet with related monthly indicators
 
-```yaml
-data:
-  default_voa: [1, 4, 5, 0, 2, 4, 4, 7, 1]
-  input_file: data/raw_data.xlsx
-  output_file: data/transformed_data.xlsx
+### Output
 
-visualization:
-  matplotlib:
-    font.family: serif
-    font.serif: ["Latin Modern Roman"]
-    mathtext.fontset: cm
-    axes.titlesize: 12
-    axes.labelsize: 10
-    xtick.labelsize: 9
-    ytick.labelsize: 9
-  seaborn_style: whitegrid
-  dpi: 300
-  figure_sizes:
-    correlation: [12, 10]
-    time_series: [12, 8]
-    distribution: [15, 10]
-    boxplot: [15, 8]
+The script generates:
+1. A CSV file with interpolated monthly GDP values
+2. Comparison plots for each GDP component showing quarterly vs. monthly values
+3. A time series plot of the interpolated monthly GDP
 
-logging:
-  level: INFO
-  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-```
+## Implementation Details
 
-## Development
+### Stock-Watson (2010) Method
 
-### Running Tests
+The Stock-Watson method for interpolating quarterly GDP to monthly frequency involves:
 
-```bash
-poetry run pytest
-```
+1. Placing quarterly values at the middle month of each quarter
+2. Using related monthly indicators to guide the interpolation
+3. Ensuring that the sum of three monthly values equals the quarterly value
+4. Applying a state-space model and Kalman filter for optimal interpolation
 
-### Code Formatting
+### Key Components
 
-```bash
-# Format code with black
-poetry run black .
+- `sw2010_gdp_interpolator.py`: Main script for interpolation
+- `sw2010_interpolator.py`: Implementation of the Stock-Watson interpolation method
+- `visualization.py`: Tools for generating comparison plots
+- `spline_detrending.py`: Implementation of cubic spline detrending
 
-# Sort imports
-poetry run isort .
+## References
 
-# Run type checking
-poetry run mypy .
-
-# Run linting
-poetry run flake8 .
-```
+Stock, J. H., & Watson, M. W. (2010). Distribution of quarterly GDP growth rates.
 
 ## License
 

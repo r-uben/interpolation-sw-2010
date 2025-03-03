@@ -1,11 +1,27 @@
 """
-Stock and Watson 2010 Kalman Filter Method for Interpolating Quarterly US National Data into Monthly Data.
+Stock-Watson (2010) interpolation method for GDP components.
 
-This package implements the methodology described in Stock and Watson (2010) for temporal disaggregation
-of quarterly time series into monthly estimates using related monthly indicators and the Kalman filter.
+This package implements the Stock-Watson (2010) methodology for interpolating
+quarterly GDP components to monthly frequency using related monthly indicators.
 """
 
-from interpolation_sw_2010.data_manager import DataManager
-from interpolation_sw_2010.kalman_filter import KalmanFilter
+import logging
+from pathlib import Path
 
-__version__ = "0.1.0"
+# Set up logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
+# Import the main interpolator class
+from .sw2010_interpolator import SW2010Interpolator
+
+# Version information
+__version__ = '0.1.0'
+
+# Make the main entry point available
+from .cli import main
+
+# Expose main components
+from .core.data_manager import DataManager
