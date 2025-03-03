@@ -17,17 +17,20 @@ This package implements the Stock-Watson (2010) procedure for temporal disaggreg
 This project uses Poetry for dependency management. To install:
 
 1. First, install Poetry if you haven't already:
+
 ```bash
 curl -sSL https://install.python-poetry.org | python3 -
 ```
 
 2. Clone the repository:
+
 ```bash
 git clone https://github.com/yourusername/interpolation-sw-2010.git
 cd interpolation-sw-2010
 ```
 
 3. Install dependencies:
+
 ```bash
 poetry install
 ```
@@ -58,12 +61,14 @@ The package supports multiple interpolation methods:
 ### Data Requirements
 
 The input data should be in Excel format with the following structure:
+
 - Quarterly sheet with GDP components (PCE, I_NS, I_ES, I_RS, I_chPI, X, IM, G, PGDP)
 - Monthly sheet with related monthly indicators
 
 ### Output
 
 The script generates:
+
 1. A CSV file with interpolated monthly GDP values
 2. Comparison plots for each GDP component showing quarterly vs. monthly values
 3. A time series plot of the interpolated monthly GDP
@@ -92,8 +97,6 @@ Stock, J. H., & Watson, M. W. (2010). Distribution of quarterly GDP growth rates
 
 ## License
 
-[Your chosen license]
+MIT License
 
-## Contributing
-
-[Your contribution guidelines]
+This project is open source and contributions are welcome. Please submit a pull request or open an issue to discuss proposed changes.
