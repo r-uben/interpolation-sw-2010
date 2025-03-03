@@ -1,0 +1,5 @@
+src/interpolation_sw_2010/replication_materials/*
+*.npy
+*.npz
+*.DS_Store
+__pycache__

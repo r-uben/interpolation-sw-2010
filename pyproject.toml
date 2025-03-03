@@ -1,0 +1,49 @@
+[tool.poetry]
+name = "interpolation-sw-2010"
+version = "0.1.0"
+description = "Stock-Watson interpolation procedure for temporal disaggregation of quarterly GDP to monthly values"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+packages = [{include = "interpolation_sw_2010", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+numpy = "^1.24.0"
+pandas = "^2.0.0"
+matplotlib = "^3.7.0"
+seaborn = "^0.12.0"
+pyyaml = "^6.0"
+tqdm = "^4.65.0"
+openpyxl = "^3.1.0"  # For Excel file support
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.3.1"
+black = "^23.3.0"
+isort = "^5.12.0"
+flake8 = "^6.0.0"
+mypy = "^1.3.0"
+pytest-cov = "^4.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+get-monthly-us-data = "interpolation_sw_2010.cli:main"
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+check_untyped_defs = true

@@ -1,0 +1,27 @@
+# Default configuration for Stock-Watson interpolation
+
+data:
+  default_voa: [1, 4, 5, 0, 2, 4, 4, 7, 1]
+  input_file: data/raw_data.xlsx
+  output_file: data/transformed_data.xlsx
+
+visualization:
+  matplotlib:
+    font.family: "serif"
+    font.serif: ["Latin Modern Roman"]
+    mathtext.fontset: "cm"
+    axes.titlesize: 12
+    axes.labelsize: 10
+    xtick.labelsize: 9
+    ytick.labelsize: 9
+  seaborn_style: whitegrid
+  dpi: 300
+  figure_sizes:
+    correlation: [12, 10]
+    time_series: [12, 8]
+    distribution: [15, 10]
+    boxplot: [15, 8]
+
+logging:
+  level: INFO
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
