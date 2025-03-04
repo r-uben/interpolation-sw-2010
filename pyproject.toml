@@ -7,8 +7,8 @@ readme = "README.md"
 packages = [{include = "interpolation_sw_2010", from = "src"}]
 
 [tool.poetry.dependencies]
-python = "^3.8.1"
-numpy = "^1.24.0"
+python = ">=3.10,<3.13"
+numpy = ">=1.26.0"
 pandas = "^2.0.0"
 matplotlib = "^3.7.0"
 seaborn = "^0.12.0"
@@ -16,6 +16,11 @@ pyyaml = "^6.0"
 tqdm = "^4.65.0"
 openpyxl = "^3.1.0"  # For Excel file support
 xlrd = "^2.0.1"
+requests = "^2.31.0"  # For API requests
+boto3 = "^1.34.0"  # For AWS services
+fredapi = "^0.5.1"  # For FRED API access
+beapy = "^0.2.4"
+scipy = "^1.15.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.3.1"
@@ -24,6 +29,7 @@ isort = "^5.12.0"
 flake8 = "^6.0.0"
 mypy = "^1.3.0"
 pytest-cov = "^4.1.0"
+ipykernel = "^6.29.5"
 
 [build-system]
 requires = ["poetry-core"]
@@ -31,6 +37,8 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 sw2010-gdp-interpolator = "mains.sw2010_gdp_interpolator:main"
+sw2010-fetch-data = "mains.fetch_all_sw_data:main"
+sw2010-update-raw-data = "mains.sw2010_update_raw_data:main"
 
 [tool.black]
 line-length = 88

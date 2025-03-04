@@ -5,3 +5,4 @@ src/interpolation_sw_2010/replication_materials/*
 __pycache__
 *.log
 backup
+.cursor/

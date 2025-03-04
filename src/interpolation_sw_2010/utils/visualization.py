@@ -339,8 +339,8 @@ class Visualization:
                 # Add a zoom inset showing recent years (if data extends past 2000)
                 try:
                     # Check if we have data past 2000
-                    recent_quarterly = quarterly_df[quarterly_df.index >= pd.Timestamp('2000-01-01')]
-                    recent_monthly = monthly_df[monthly_df.index >= pd.Timestamp('2000-01-01')]
+                    recent_quarterly = quarterly_df[quarterly_df.index >= pd.Timestamp('2013-01-01')]
+                    recent_monthly = monthly_df[monthly_df.index >= pd.Timestamp('2013-01-01')]
                     
                     if not recent_quarterly.empty and not recent_monthly.empty:
                         # Create an inset axes - moved to the left side and higher up
