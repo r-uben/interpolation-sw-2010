@@ -1,0 +1,9 @@
+series_id: EXPGS
+title: Exports of Goods and Services
+units: Billions of Dollars
+frequency: Quarterly
+last_updated: 2025-03-05T13:29:29.223459
+source: Federal Reserve Economic Data (FRED)
+observation_start: 1946-03-31T00:00:00
+observation_end: 2024-12-31T00:00:00
+notes: BEA Account Code: B020RC  A Guide to the National Income and Product Accounts of the United States (NIPA) - (http://www.bea.gov/national/pdf/nipaguid.pdf)

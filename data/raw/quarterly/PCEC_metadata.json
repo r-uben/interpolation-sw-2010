@@ -1,0 +1,5 @@
+{
+  "description": "Personal Consumption Expenditures",
+  "fred_code": "PCEC",
+  "frequency": "quarterly"
+}

@@ -1,0 +1,5 @@
+{
+  "description": "GDP Deflator",
+  "fred_code": "GDPDEF",
+  "frequency": "quarterly"
+}

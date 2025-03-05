@@ -1,0 +1,9 @@
+series_id: A681RC1Q027SBEA
+title: Private fixed investment: Nonresidential: Equipment: Transportation equipment
+units: Billions of Dollars
+frequency: Quarterly
+last_updated: 2025-03-05T13:29:20.571726
+source: Federal Reserve Economic Data (FRED)
+observation_start: 1947-03-31T00:00:00
+observation_end: 2024-12-31T00:00:00
+notes: BEA Account Code: A681RC  For more information about this series, please see http://www.bea.gov/national/.

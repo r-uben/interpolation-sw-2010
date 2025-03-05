@@ -1,0 +1,9 @@
+{
+  "description": "Non-Residential Equipment",
+  "fred_codes": [
+    "A680RC1Q027SBEA",
+    "A681RC1Q027SBEA",
+    "A682RC1Q027SBEA"
+  ],
+  "frequency": "quarterly"
+}

@@ -2,7 +2,7 @@
   "full_url": "https://apps.bea.gov/iTable/?isuri=1&reqid=19&step=4&categories=flatfiles&nipa_table_list=1#eyJhcHBpZCI6MTksInN0ZXBzIjpbMSwyLDMsM10sImRhdGEiOltbImNhdGVnb3JpZXMiLCJVbmRlcmx5aW5nIl0sWyJOSVBBX1RhYmxlX0xpc3QiLCIyMDgwMSJdLFsiRmlyc3RfWWVhciIsIjIwMjEiXV0=",
   "base_url": "https://apps.bea.gov/iTable/?isuri=1&reqid=19&step=4&categories=flatfiles&nipa_table_list=1",
   "hash_params": "eyJhcHBpZCI6MTksInN0ZXBzIjpbMSwyLDMsM10sImRhdGEiOltbImNhdGVnb3JpZXMiLCJVbmRlcmx5aW5nIl0sWyJOSVBBX1RhYmxlX0xpc3QiLCIyMDgwMSJdLFsiRmlyc3RfWWVhciIsIjIwMjEiXV0=",
-  "table_id": null,
+  "table_id": "2.7B",
   "decoded_params": null,
   "raw_decoded": "{\"appid\":19,\"steps\":[1,2,3,3],\"data\":[[\"categories\",\"Underlying\"],[\"NIPA_Table_List\",\"20801\"],[\"First_Year\",\"2021\"]]"
 }

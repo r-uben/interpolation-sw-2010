@@ -1,0 +1,45 @@
+{
+  "source_info": {
+    "id": "6",
+    "name": "total public construction spending",
+    "varname": "con_gov",
+    "source": "U. S. Bureau",
+    "release": "Construction spending",
+    "link": "https://fred.stlouisfed.org/series/TLPBLCONS",
+    "notes": "Data source labeled as U. S. Bureau; verify actual agency if necessary."
+  },
+  "data_characteristics": {
+    "description": "Monthly series for total public construction spending.",
+    "units": "million of dollars, seasonally adjusted annual rate",
+    "frequency": "monthly",
+    "seasonal_adjustment": "Seasonally Adjusted Annual Rate",
+    "tables": null
+  },
+  "date_info": {
+    "expected_start_date": "1993-01-31",
+    "expected_end_date": "9999-99-99",
+    "actual_start_date": "1993-01-31",
+    "actual_end_date": "2025-01-31",
+    "last_updated": "2025-03-05",
+    "fred_last_updated": "2025-03-03 09:16:26-06"
+  },
+  "fred_info": {
+    "fred_code": "TLPBLCONS",
+    "fred_id": "TLPBLCONS",
+    "fred_title": "Total Public Construction Spending: Total Construction in the United States",
+    "fred_notes": "Definitions related to the construction data can be found at https://www.census.gov/construction/c30/definitions.html Methodology details can be found at https://www.census.gov/construction/c30/methodology.html"
+  },
+  "data_quality": {
+    "num_observations": 385,
+    "missing_values": "0",
+    "missing_pct": 0.0,
+    "min_value": 113906.0,
+    "max_value": 507220.0,
+    "mean_value": 265066.7974025974,
+    "std_dev": 90938.51416390667
+  },
+  "processing_info": {
+    "processed_at": "2025-03-05T13:28:32.817659",
+    "processor_version": "1.0.0"
+  }
+}

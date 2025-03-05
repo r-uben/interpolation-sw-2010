@@ -32,6 +32,8 @@ logger = logging.getLogger(__name__)
 # Constants
 DATA_DIR = Path("data")
 RAW_DATA_DIR = DATA_DIR / "raw"
+MONTHLY_DATA_DIR = RAW_DATA_DIR / "monthly"
+QUARTERLY_DATA_DIR = RAW_DATA_DIR / "quarterly"
 SOURCES_FILE = DATA_DIR / "sources.json"
 VERSION = "1.0.0"
 
@@ -91,7 +93,9 @@ def setup_directories() -> None:
     Create necessary directories for data storage if they don't exist.
     """
     RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
-    logger.debug(f"Ensured directory exists: {RAW_DATA_DIR}")
+    MONTHLY_DATA_DIR.mkdir(parents=True, exist_ok=True)
+    QUARTERLY_DATA_DIR.mkdir(parents=True, exist_ok=True)
+    logger.debug(f"Ensured directories exist: {RAW_DATA_DIR}, {MONTHLY_DATA_DIR}, {QUARTERLY_DATA_DIR}")
 
 
 def calculate_data_quality_metrics(series_data: pd.DataFrame) -> Dict[str, Any]:
@@ -264,7 +268,8 @@ def create_bea_metadata(
 def save_data_and_metadata(
     varname: str, 
     series_data: pd.DataFrame, 
-    metadata: Dict[str, Any]
+    metadata: Dict[str, Any],
+    is_quarterly: bool = False
 ) -> Tuple[str, str]:
     """
     Save data series and its metadata to files.
@@ -273,17 +278,21 @@ def save_data_and_metadata(
         varname (str): Variable name
         series_data (pd.DataFrame): Data to save
         metadata (Dict[str, Any]): Metadata to save
+        is_quarterly (bool): Whether the data is quarterly (determines save location)
         
     Returns:
         Tuple[str, str]: Paths to saved data and metadata files
     """
+    # Determine the appropriate directory
+    save_dir = QUARTERLY_DATA_DIR if is_quarterly else MONTHLY_DATA_DIR
+    
     # Save to CSV with appropriate date formatting
-    data_file = RAW_DATA_DIR / f"{varname}.csv"
+    data_file = save_dir / f"{varname}.csv"
     series_data.to_csv(data_file, date_format='%Y-%m-%d')
     logger.info(f"Saved data to {data_file}")
     
     # Save metadata
-    metadata_file = RAW_DATA_DIR / f"{varname}_metadata.json"
+    metadata_file = save_dir / f"{varname}_metadata.json"
     with open(metadata_file, 'w') as f:
         json.dump(metadata, f, indent=2, default=str)  # default=str handles any non-serializable objects
     logger.info(f"Saved metadata to {metadata_file}")
@@ -327,8 +336,11 @@ def process_fred_source(
         # Create metadata
         metadata = create_metadata(source, series_data, series_info)
         
+        # Determine if data is quarterly based on frequency
+        is_quarterly = source.get('frequency', '').lower().startswith('q')
+        
         # Save data and metadata
-        data_file, metadata_file = save_data_and_metadata(varname, series_data, metadata)
+        data_file, metadata_file = save_data_and_metadata(varname, series_data, metadata, is_quarterly=is_quarterly)
         
         return {
             'varname': varname,
@@ -373,6 +385,128 @@ def fetch_fred_data(sources: List[Dict[str, Any]]) -> Dict[str, Any]:
         if result:
             results[source.get('varname')] = result
     
+    # Fetch quarterly data
+    quarterly_data = fetch_quarterly_data()
+    results.update(quarterly_data)
+    
+    return results
+
+
+def fetch_quarterly_data() -> Dict[str, Any]:
+    """
+    Fetch quarterly GDP components data from FRED based on info.txt.
+    
+    Returns:
+        Dict[str, Any]: Results of quarterly data fetching
+    """
+    logger.info("Fetching quarterly GDP components data from FRED")
+    
+    results = {}
+    
+    try:
+        # Initialize FRED data fetcher
+        data_fetcher = DataFetcher()
+        
+        # Read info.txt to get the FRED series codes
+        info_path = RAW_DATA_DIR / "info.txt"
+        if not info_path.exists():
+            logger.error(f"info.txt not found at {info_path}")
+            return results
+            
+        # Parse info.txt to extract FRED codes
+        with open(info_path, 'r') as f:
+            info_content = f.read()
+            
+        # Parse the JSON section from info.txt
+        try:
+            json_start = info_content.find('{')
+            json_end = info_content.rfind('}') + 1
+            if json_start >= 0 and json_end > json_start:
+                json_str = info_content[json_start:json_end]
+                mapping = json.loads(json_str)
+                components = mapping.get('components', [])
+            else:
+                logger.error("Could not find JSON data in info.txt")
+                return results
+        except json.JSONDecodeError as e:
+            logger.error(f"Error parsing JSON from info.txt: {str(e)}")
+            return results
+            
+        # Process each component
+        for component in components:
+            user_code = component.get('user_code')
+            fred_code = component.get('fred_code')
+            description = component.get('description')
+            
+            # Skip if no FRED code
+            if not fred_code:
+                continue
+                
+            # Handle case where fred_code is a list (e.g., for equip_q)
+            if isinstance(fred_code, list):
+                logger.info(f"Found multiple FRED codes for {user_code}: {fred_code}")
+                # Fetch and combine data from all codes
+                combined_data = None
+                for code in fred_code:
+                    try:
+                        data = data_fetcher.get_series(code)
+                        if combined_data is None:
+                            combined_data = data
+                        else:
+                            combined_data['value'] += data['value']
+                    except Exception as e:
+                        logger.error(f"Error fetching data for {code}: {str(e)}")
+                if combined_data is not None:
+                    # Rename the value column to match user_code
+                    combined_data.columns = [user_code]
+                    # Create metadata for combined data
+                    metadata = {
+                        'description': description,
+                        'fred_codes': fred_code,
+                        'frequency': 'quarterly'
+                    }
+                    # Save data and metadata
+                    data_file, metadata_file = save_data_and_metadata(user_code, combined_data, metadata, is_quarterly=True)
+                    results[user_code] = {
+                        'data': combined_data,
+                        'description': description,
+                        'fred_codes': fred_code,
+                        'files': {
+                            'data': data_file,
+                            'metadata': metadata_file
+                        }
+                    }
+            else:
+                # Single FRED code case
+                try:
+                    data = data_fetcher.get_series(fred_code)
+                    # Rename the value column to match user_code
+                    data.columns = [user_code]
+                    # Create metadata
+                    metadata = {
+                        'description': description,
+                        'fred_code': fred_code,
+                        'frequency': 'quarterly'
+                    }
+                    # Save data and metadata
+                    data_file, metadata_file = save_data_and_metadata(user_code, data, metadata, is_quarterly=True)
+                    results[user_code] = {
+                        'data': data,
+                        'description': description,
+                        'fred_code': fred_code,
+                        'files': {
+                            'data': data_file,
+                            'metadata': metadata_file
+                        }
+                    }
+                except Exception as e:
+                    logger.error(f"Error fetching data for {fred_code}: {str(e)}")
+                    
+        logger.info(f"Successfully fetched data for {len(results)} quarterly series")
+        
+    except Exception as e:
+        logger.error(f"Error in fetch_quarterly_data: {str(e)}")
+        
     return results
 
 
@@ -621,13 +755,13 @@ def fetch_bea_data(sources: List[Dict[str, Any]]) -> Dict[str, Any]:
 
 def fetch_bea_api_data(sources: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
-    Fetch data from BEA API using the beaapi package.
+    Fetch data from BEA API for sources with BEA API configuration.
     
     Args:
         sources (List[Dict[str, Any]]): List of data source configurations
         
     Returns:
-        Dict[str, Any]: Dictionary of results by variable name
+        Dict[str, Any]: Results of BEA API data fetching
     """
     results = {}
     
@@ -802,7 +936,7 @@ def main(fetch_fred=None, fetch_bea=None, fetch_all=None):
     Main execution function.
     
     Args:
-        fetch_fred (bool): Whether to fetch FRED data
+        fetch_fred (bool): Whether to fetch FRED data (both monthly and quarterly)
         fetch_bea (bool): Whether to fetch BEA data
         fetch_all (bool): Whether to fetch all data (overrides other flags)
     """
@@ -811,19 +945,29 @@ def main(fetch_fred=None, fetch_bea=None, fetch_all=None):
         # Set up argument parser
         parser = argparse.ArgumentParser(description='Update raw data for the Stock-Watson 2010 interpolation project.')
         parser.add_argument('--bea', action='store_true', help='Fetch BEA data only')
-        parser.add_argument('--fred', action='store_true', help='Fetch FRED data only')
+        parser.add_argument('--fred', action='store_true', help='Fetch FRED data (both monthly and quarterly)')
         parser.add_argument('--all', action='store_true', help='Fetch all data (default if no flags are specified)')
+        parser.add_argument('--final', action='store_true', help='Update raw_data.xlsx with fetched data')
+        parser.add_argument('--quarterly', action='store_true', help='Fetch quarterly GDP components data')
+        parser.add_argument('--monthly', action='store_true', help='Fetch monthly data')
         
         # Parse arguments
         args = parser.parse_args()
         
         # If no flags are specified, default to fetching all data
-        if not (args.bea or args.fred or args.all):
+        if not (args.bea or args.fred or args.all or args.quarterly or args.monthly):
             args.all = True
         
         fetch_fred = args.fred
         fetch_bea = args.bea
         fetch_all = args.all
+        fetch_quarterly = args.quarterly or args.fred  # Also fetch quarterly if --fred is used
+        fetch_monthly = args.monthly or args.fred  # Also fetch monthly if --fred is used
+        do_final_update = args.final
+    else:
+        fetch_quarterly = fetch_all or fetch_fred  # If fetch_all or fetch_fred is True, also fetch quarterly data
+        fetch_monthly = fetch_all or fetch_fred  # If fetch_all or fetch_fred is True, also fetch monthly data
+        do_final_update = False  # When called programmatically, don't do final update by default
     
     try:
         # Setup
@@ -833,19 +977,30 @@ def main(fetch_fred=None, fetch_bea=None, fetch_all=None):
         sources = load_sources()
         logger.info(f"Loaded {len(sources)} data sources")
         
-        # If fetch_all is True, set both fetch_fred and fetch_bea to True
+        # If fetch_all is True, set all fetch flags to True
         if fetch_all:
             fetch_fred = True
             fetch_bea = True
+            fetch_quarterly = True
+            fetch_monthly = True
         
         # Fetch data from FRED if requested
-        if fetch_fred:
-            logger.info("Fetching FRED data...")
+        if fetch_fred or fetch_monthly:
+            logger.info("Fetching FRED monthly data...")
             fred_results = fetch_fred_data(sources)
             successful_fred = sum(1 for r in fred_results.values() if 'error' not in r)
-            logger.info(f"Fetched data for {successful_fred} FRED sources successfully")
+            logger.info(f"Fetched data for {successful_fred} FRED monthly sources successfully")
         else:
-            logger.info("Skipping FRED data fetching")
+            logger.info("Skipping FRED monthly data fetching")
+        
+        # Fetch quarterly GDP components if requested
+        if fetch_quarterly:
+            logger.info("Fetching quarterly GDP components data...")
+            quarterly_results = fetch_quarterly_data()
+            successful_quarterly = sum(1 for r in quarterly_results.values() if 'error' not in r)
+            logger.info(f"Fetched data for {successful_quarterly} quarterly series successfully")
+        else:
+            logger.info("Skipping quarterly data fetching")
         
         # Fetch data from BEA if requested
         if fetch_bea:
@@ -867,10 +1022,201 @@ def main(fetch_fred=None, fetch_bea=None, fetch_all=None):
         else:
             logger.info("Skipping BEA data fetching")
         
+        # Update raw_data.xlsx if requested
+        if do_final_update:
+            logger.info("Updating raw_data.xlsx with fetched data...")
+            try:
+                update_raw_data_xlsx()
+                logger.info("Successfully updated raw_data.xlsx")
+            except Exception as e:
+                logger.error(f"Error updating raw_data.xlsx: {str(e)}")
+                raise
+        
         logger.info("Data update completed")
         
     except Exception as e:
         logger.error(f"Error in main execution: {str(e)}")
+        raise
+
+
+def update_raw_data_xlsx() -> None:
+    """
+    Update raw_data.xlsx Monthly and Quarterly sheets with data from CSV files.
+    """
+    logger.info("Updating raw_data.xlsx with latest data from CSV files")
+    
+    # Load the raw_data.xlsx file
+    excel_path = DATA_DIR / "raw_data.xlsx"
+    try:
+        # Load both Monthly and Quarterly sheets
+        df_monthly = pd.read_excel(excel_path, sheet_name="Monthly")
+        df_quarterly = pd.read_excel(excel_path, sheet_name="Quarterly")
+        logger.info(f"Loaded Monthly and Quarterly sheets from {excel_path}")
+    except Exception as e:
+        logger.error(f"Error loading {excel_path}: {str(e)}")
+        raise
+    
+    # Create a backup of the original file
+    backup_path = DATA_DIR / f"raw_data_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+    try:
+        import shutil
+        shutil.copy2(excel_path, backup_path)
+        logger.info(f"Created backup at {backup_path}")
+        
+        # Remove the original file to avoid any locking issues
+        os.remove(excel_path)
+        logger.info(f"Removed original file {excel_path}")
+    except Exception as e:
+        logger.error(f"Error handling file operations: {str(e)}")
+        raise
+    
+    # Process Monthly Data
+    # Create a date index for the monthly data
+    df_monthly['Date'] = pd.to_datetime(
+        df_monthly[['Year', 'Month']].assign(Day=1)
+    ).dt.to_period('M').dt.to_timestamp('M')  # Convert to end-of-month dates
+    df_monthly.set_index('Date', inplace=True)
+    
+    # Find the maximum date range from monthly CSV files
+    max_date_monthly = df_monthly.index.max()
+    min_date_monthly = df_monthly.index.min()
+    
+    # First pass: determine the full date range from monthly CSV files
+    for column in df_monthly.columns:
+        if column in ['Year', 'Month']:
+            continue
+            
+        # Check direct match in monthly directory
+        csv_path = MONTHLY_DATA_DIR / f"{column.lower().strip()}.csv"
+        if csv_path.exists():
+            try:
+                csv_data = pd.read_csv(csv_path, index_col=0, parse_dates=True)
+                csv_data.index = pd.to_datetime(csv_data.index)
+                max_date_monthly = max(max_date_monthly, csv_data.index.max())
+                min_date_monthly = min(min_date_monthly, csv_data.index.min())
+            except Exception as e:
+                logger.error(f"Error reading {csv_path}: {str(e)}")
+                continue
+    
+    # Create the full date range with end-of-month dates for monthly data
+    all_dates_monthly = pd.date_range(min_date_monthly, max_date_monthly, freq='ME')
+    df_monthly = df_monthly.reindex(all_dates_monthly)
+    
+    # Process Quarterly Data
+    # Create a date index for the quarterly data - convert quarters to months first
+    df_quarterly['Month'] = df_quarterly['Quarter'] * 3  # Convert quarter to end-month
+    df_quarterly['Date'] = pd.to_datetime(
+        df_quarterly[['Year', 'Month']].assign(Day=1)
+    ).dt.to_period('Q').dt.to_timestamp('Q')  # Convert to end-of-quarter dates
+    df_quarterly.drop('Month', axis=1, inplace=True)  # Remove temporary month column
+    df_quarterly.set_index('Date', inplace=True)
+    
+    # Find the maximum date range from quarterly CSV files
+    max_date_quarterly = df_quarterly.index.max()
+    min_date_quarterly = df_quarterly.index.min()
+    
+    # First pass: determine the full date range from quarterly CSV files
+    for column in df_quarterly.columns:
+        if column in ['Year', 'Quarter']:
+            continue
+            
+        # Check direct match in quarterly directory
+        csv_path = QUARTERLY_DATA_DIR / f"{column.lower().strip()}.csv"
+        if csv_path.exists():
+            try:
+                csv_data = pd.read_csv(csv_path, index_col=0, parse_dates=True)
+                csv_data.index = pd.to_datetime(csv_data.index)
+                max_date_quarterly = max(max_date_quarterly, csv_data.index.max())
+                min_date_quarterly = min(min_date_quarterly, csv_data.index.min())
+            except Exception as e:
+                logger.error(f"Error reading {csv_path}: {str(e)}")
+                continue
+    
+    # Create the full date range with end-of-quarter dates for quarterly data
+    all_dates_quarterly = pd.date_range(min_date_quarterly, max_date_quarterly, freq='QE')
+    df_quarterly = df_quarterly.reindex(all_dates_quarterly)
+    
+    # Update Monthly Data
+    for column in df_monthly.columns:
+        if column in ['Year', 'Month']:
+            continue
+            
+        logger.info(f"Processing monthly column: {column}")
+        csv_path = MONTHLY_DATA_DIR / f"{column.lower().strip()}.csv"
+        
+        if csv_path.exists():
+            try:
+                csv_data = pd.read_csv(csv_path, index_col=0, parse_dates=True)
+                csv_data.index = pd.to_datetime(csv_data.index)
+                new_series = csv_data.iloc[:, 0]
+                
+                # Update values where new data is available
+                for idx in new_series.index:
+                    if idx in df_monthly.index:
+                        df_monthly.loc[idx, column] = new_series[idx]
+                        
+                logger.info(f"Updated monthly column {column}")
+            except Exception as e:
+                logger.error(f"Error processing {csv_path}: {str(e)}")
+    
+    # Update Quarterly Data
+    for column in df_quarterly.columns:
+        if column in ['Year', 'Quarter']:
+            continue
+            
+        logger.info(f"Processing quarterly column: {column}")
+        csv_path = QUARTERLY_DATA_DIR / f"{column.lower().strip()}.csv"
+        
+        if csv_path.exists():
+            try:
+                csv_data = pd.read_csv(csv_path, index_col=0, parse_dates=True)
+                csv_data.index = pd.to_datetime(csv_data.index)
+                
+                # Ensure the data is quarterly
+                if not csv_data.index.freqstr or 'Q' not in csv_data.index.freqstr:
+                    csv_data = csv_data.resample('QE').last()
+                
+                new_series = csv_data.iloc[:, 0]
+                
+                # Update values where new data is available
+                for idx in new_series.index:
+                    if idx in df_quarterly.index:
+                        df_quarterly.loc[idx, column] = new_series[idx]
+                        
+                logger.info(f"Updated quarterly column {column}")
+            except Exception as e:
+                logger.error(f"Error processing {csv_path}: {str(e)}")
+    
+    # Reset indices and prepare final DataFrames
+    # Monthly data
+    df_monthly = df_monthly.reset_index()
+    df_monthly['Year'] = df_monthly['index'].dt.year
+    df_monthly['Month'] = df_monthly['index'].dt.month
+    df_monthly = df_monthly.drop('index', axis=1)
+    cols_monthly = ['Year', 'Month'] + [col for col in df_monthly.columns if col not in ['Year', 'Month']]
+    df_monthly = df_monthly[cols_monthly]
+    
+    # Quarterly data
+    df_quarterly = df_quarterly.reset_index()
+    df_quarterly['Year'] = df_quarterly['index'].dt.year
+    df_quarterly['Quarter'] = df_quarterly['index'].dt.quarter
+    df_quarterly = df_quarterly.drop('index', axis=1)
+    cols_quarterly = ['Year', 'Quarter'] + [col for col in df_quarterly.columns if col not in ['Year', 'Quarter']]
+    df_quarterly = df_quarterly[cols_quarterly]
+    
+    # Save the updated file with both sheets
+    try:
+        with pd.ExcelWriter(excel_path, engine='openpyxl') as writer:
+            df_monthly.to_excel(writer, sheet_name='Monthly', index=False)
+            df_quarterly.to_excel(writer, sheet_name='Quarterly', index=False)
+            
+        logger.info(f"Successfully updated {excel_path}")
+        logger.info(f"Monthly date range: {df_monthly['Year'].min()}-{df_monthly['Year'].max()}")
+        logger.info(f"Quarterly date range: {df_quarterly['Year'].min()}-{df_quarterly['Year'].max()}")
+        
+    except Exception as e:
+        logger.error(f"Error saving updated file: {str(e)}")
+        logger.info(f"Backup file is available at {backup_path}")
         raise
 
 

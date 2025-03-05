@@ -1,0 +1,53 @@
+{
+  "source_info": {
+    "id": "14",
+    "name": "Wage and Salary Disbursements by Industry, Government, Government, NIPA",
+    "varname": "wages_g_2",
+    "source": "BEA: NIPA tables",
+    "table": "2.7B",
+    "link": "https://apps.bea.gov/iTable/?isuri=1&reqid=19&step=4&categories=flatfiles&nipa_table_list=1#eyJhcHBpZCI6MTksInN0ZXBzIjpbMSwyLDMsM10sImRhdGEiOltbImNhdGVnb3JpZXMiLCJVbmRlcmx5aW5nIl0sWyJOSVBBX1RhYmxlX0xpc3QiLCIyMDgwMSJdLFsiRmlyc3RfWWVhciIsIjIwMjEiXV0=",
+    "notes": null
+  },
+  "data_characteristics": {
+    "description": "Monthly series of wage and salary disbursements by industry (Government) from 2001 to 2025 (alternative source).",
+    "units": "",
+    "frequency": "",
+    "time_window": "2001-2025"
+  },
+  "date_info": {
+    "expected_start_date": "2001-01-31",
+    "expected_end_date": "9999-99-99",
+    "actual_start_date": "2001-01-01",
+    "actual_end_date": "2025-01-01",
+    "last_updated": "2025-03-05",
+    "source_last_updated": "9999"
+  },
+  "data_quality": {
+    "num_observations": 289,
+    "missing_values": "0",
+    "missing_pct": 0.0,
+    "min_value": 15482898.0,
+    "max_value": 39116415.0,
+    "mean_value": 23765156.06920415,
+    "std_dev": 6579568.593992994
+  },
+  "processing_info": {
+    "processed_at": "2025-03-05T13:29:44.963865",
+    "processor_version": "1.0.0"
+  },
+  "bea_api_info": {
+    "dataset": "NIPA",
+    "table_name": "T20700B",
+    "frequency": "M",
+    "series_code": null,
+    "line_number": null,
+    "excluded_patterns": [
+      "durable goods",
+      "nondurable goods",
+      "other",
+      "1"
+    ],
+    "time_window": "2001-2025",
+    "retrieved_at": "2025-03-05T13:29:44.963867"
+  }
+}

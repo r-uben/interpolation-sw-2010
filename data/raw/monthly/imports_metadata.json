@@ -1,0 +1,45 @@
+{
+  "source_info": {
+    "id": "5",
+    "name": "imports of goods and services, balance of payments basis",
+    "varname": "imports",
+    "source": "U. S. Bureau of Economic Analysis",
+    "release": "U. S. International Trade in Goods and Services",
+    "link": "https://fred.stlouisfed.org/series/BOPTIMP",
+    "notes": "Data from U. S. Bureau of Economic Analysis."
+  },
+  "data_characteristics": {
+    "description": "Monthly imports of goods and services on a balance of payments basis.",
+    "units": "million of dollars, seasonally adjusted",
+    "frequency": "monthly",
+    "seasonal_adjustment": "Seasonally Adjusted",
+    "tables": null
+  },
+  "date_info": {
+    "expected_start_date": "1992-01-31",
+    "expected_end_date": "9999-99-99",
+    "actual_start_date": "1992-01-31",
+    "actual_end_date": "2024-12-31",
+    "last_updated": "2025-03-05",
+    "fred_last_updated": "2025-02-05 07:51:05-06"
+  },
+  "fred_info": {
+    "fred_code": "BOPTIMP",
+    "fred_id": "BOPTIMP",
+    "fred_title": "Imports of Goods and Services: Balance of Payments Basis",
+    "fred_notes": "Further information related to the international trade data can be found at https://www.census.gov/foreign-trade/data/index.html  Methodology details can be found at https://www.census.gov/foreign-trade/Press-Release/current_press_release/explain.pdf"
+  },
+  "data_quality": {
+    "num_observations": 396,
+    "missing_values": "0",
+    "missing_pct": 0.0,
+    "min_value": 52277.0,
+    "max_value": 364939.0,
+    "mean_value": 182788.37626262626,
+    "std_dev": 81999.72485917002
+  },
+  "processing_info": {
+    "processed_at": "2025-03-05T13:28:31.284261",
+    "processor_version": "1.0.0"
+  }
+}

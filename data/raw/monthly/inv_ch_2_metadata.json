@@ -1,0 +1,53 @@
+{
+  "source_info": {
+    "id": "12",
+    "name": "Change in Private Inventories by Industry",
+    "varname": "inv_ch_2",
+    "source": "BEA: NIPA tables",
+    "table": "5.7.5BM1",
+    "link": "https://apps.bea.gov/iTable/?reqid=19&step=3&isuri=1&nipa_table_list=164&categories=survey#eyJhcH                  BpZCI6MTksInN0ZXBzIjpbMSwyLDMsM10sImRhdGEiOltbImNhdGVnb3JpZXMiLCJVbmRlcmx5aW5nIl0sWyJOSVBBX1RhYmxlX0xpc3QiLCIyMDg3Il0sWyJGaXJzdF9ZZWFyIiwiMTk5NyJdLFsiTGFzdF9ZZWFyIiwiMjAyNCJdLFsiU2NhbGUiLCItNiJdLFsiU2VyaWVzIiwiTSJdXX0=",
+    "notes": "Uses underlying detail from BEA NIPA Table 5.7.5BM1."
+  },
+  "data_characteristics": {
+    "description": "Monthly data on the change in private inventories by industry for the period 1997-2025 (NAICS-based).",
+    "units": "",
+    "frequency": "",
+    "time_window": "1997-2025"
+  },
+  "date_info": {
+    "expected_start_date": "1997-01-31",
+    "expected_end_date": "9999-99-99",
+    "actual_start_date": "1997-01-01",
+    "actual_end_date": "2024-12-01",
+    "last_updated": "2025-03-05",
+    "source_last_updated": "9999"
+  },
+  "data_quality": {
+    "num_observations": 336,
+    "missing_values": "0",
+    "missing_pct": 0.0,
+    "min_value": -1240617.0,
+    "max_value": 1110588.0,
+    "mean_value": 114488.27380952382,
+    "std_dev": 231964.1401467355
+  },
+  "processing_info": {
+    "processed_at": "2025-03-05T13:29:42.282195",
+    "processor_version": "1.0.0"
+  },
+  "bea_api_info": {
+    "dataset": "NIPA",
+    "table_name": "U50705BM1",
+    "frequency": "M",
+    "series_code": null,
+    "line_number": null,
+    "excluded_patterns": [
+      "durable goods",
+      "nondurable goods",
+      "other",
+      "1"
+    ],
+    "time_window": "1997-2025",
+    "retrieved_at": "2025-03-05T13:29:42.282199"
+  }
+}

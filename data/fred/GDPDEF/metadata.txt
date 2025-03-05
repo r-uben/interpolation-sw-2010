@@ -1,0 +1,9 @@
+series_id: GDPDEF
+title: Gross Domestic Product: Implicit Price Deflator
+units: Index 2017=100
+frequency: Quarterly
+last_updated: 2025-03-05T13:29:37.483885
+source: Federal Reserve Economic Data (FRED)
+observation_start: 1947-03-31T00:00:00
+observation_end: 2024-12-31T00:00:00
+notes: BEA Account Code: A191RD  The number of decimal places reported varies over time. A Guide to the National Income and Product Accounts of the United States (http://www.bea.gov/national/pdf/nipaguid.pdf) (NIPA).
