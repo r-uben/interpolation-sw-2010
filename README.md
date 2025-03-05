@@ -9,6 +9,7 @@ This package implements the Stock-Watson (2010) procedure for temporal disaggreg
 - Implement the Stock-Watson (2010) Kalman filter interpolation method
 - Generate comparison visualizations between quarterly and monthly data
 - Fetch data directly from FRED and BEA (Bureau of Economic Analysis) using web scraping or API
+- Upload data to AWS S3 for storage and sharing
 - Configurable via YAML configuration files
 - Comprehensive data validation and quality metrics
 - Progress tracking and logging
@@ -20,6 +21,7 @@ This package implements the Stock-Watson (2010) procedure for temporal disaggreg
 - Poetry (dependency management)
 - Internet connection (for data fetching features)
 - BEA API key (for accessing BEA data)
+- AWS credentials (for S3 upload features)
 
 ## Installation
 
@@ -50,7 +52,7 @@ Copy the example environment file and add your API keys:
 
 ```bash
 cp .env.example .env
-# Edit .env to add your BEA API key
+# Edit .env to add your BEA API key and AWS credentials
 ```
 
 ## Usage
@@ -86,6 +88,31 @@ poetry run sw2010-update-raw-data --bea
 poetry run sw2010-update-raw-data --quarterly
 poetry run sw2010-update-raw-data --monthly
 ```
+
+### AWS Upload
+
+Upload GDP data files to AWS S3 for storage and sharing:
+
+```bash
+# Upload raw_data.xlsx and gdp.csv to AWS S3
+poetry run sw2010-upload-to-aws
+```
+
+This script uploads the following files to the `macroeconomic_data` bucket in the `usa/national_accounting/` folder:
+- `data/raw_data.xlsx` - Raw data for Stock-Watson GDP interpolation
+- `data/gdp.csv` - Monthly interpolated GDP data
+
+The files are uploaded with comprehensive metadata including file information, date ranges, and data quality metrics.
+
+#### AWS Credentials
+
+Before using the upload functionality, ensure your AWS credentials are properly configured. The script uses boto3, which looks for credentials in:
+- Environment variables: `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
+- AWS credentials file: `~/.aws/credentials`
+- AWS config file: `~/.aws/config`
+- Instance profile credentials (if running on an EC2 instance)
+
+Make sure your credentials have permissions to write to the S3 bucket.
 
 ### Configuration
 
@@ -149,6 +176,7 @@ The script generates:
 1. **Missing or invalid BEA API key**: Ensure your BEA API key is valid and set correctly in the .env file
 2. **Data fetching failures**: Check your internet connection; BEA and FRED websites occasionally change their structure
 3. **Interpolation errors**: Ensure your data has sufficient coverage and no extreme outliers
+4. **AWS upload failures**: Verify your AWS credentials are correctly configured and you have permissions for the S3 bucket
 
 ### Performance Considerations
 
@@ -166,6 +194,7 @@ The script generates:
 - `core/data_manager.py`: Manages data loading, validation, and transformation
 - `core/kalman_optimization.py`: Optimizes Kalman filter parameters
 - `utils/visualization.py`: Generates comparison plots and visualizations
+- `aws_manager/bucket_manager.py`: Manages AWS S3 bucket operations for data storage
 
 ### BEA Data Fetcher
 

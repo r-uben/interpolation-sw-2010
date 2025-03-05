@@ -340,7 +340,7 @@ def main():
     
     # Define input and output paths
     input_path = project_root / "data" / "raw_data.xlsx"
-    output_path = project_root / "data" / "monthly_gdp.csv"
+    output_path = project_root / "data" / "gdp.csv"
     figures_dir = project_root / "figures"
     
     # Create output directories if they don't exist

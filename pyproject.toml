@@ -47,6 +47,7 @@ sw2010-gdp-interpolator = "mains.sw2010_gdp_interpolator:main"
 sw2010-fetch-data = "mains.fetch_all_sw_data:main"
 sw2010-update-raw-data = "mains.sw2010_update_raw_data:main"
 sw2010-bea-fetcher = "interpolation_sw_2010.cli:main"  # Add CLI entry point for BEA data fetcher
+sw2010-upload-to-aws = "mains.sw2010_upload_to_aws:main"  # New entry point for AWS upload script
 
 [tool.black]
 line-length = 88
