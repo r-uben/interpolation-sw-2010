@@ -189,7 +189,7 @@
     "name": "Change in Private Inventories by Industry",
     "varname": "inv_ch_2",
     "fredcode": null,
-    "link": "https://apps.bea.gov/iTable/?reqid=19&step=3&isuri=1&nipa_table_list=164&categories=survey#eyJhcHBpZCI6MTksInN0ZXBzIjpbMSwyLDMsM10sImRhdGEiOltbImNhdGVnb3JpZXMiLCJVbmRlcmx5aW5nIl0sWyJOSVBBX1RhYmxlX0xpc3QiLCIyMDg3Il0sWyJGaXJzdF9ZZWFyIiwiMTk5NyJdLFsiTGFzdF9ZZWFyIiwiMjAyNCJdLFsiU2NhbGUiLCItNiJdLFsiU2VyaWVzIiwiTSJdXX0=",
+    "link": "https://apps.bea.gov/iTable/?reqid=19&step=3&isuri=1&nipa_table_list=164&categories=survey#eyJhcH                  BpZCI6MTksInN0ZXBzIjpbMSwyLDMsM10sImRhdGEiOltbImNhdGVnb3JpZXMiLCJVbmRlcmx5aW5nIl0sWyJOSVBBX1RhYmxlX0xpc3QiLCIyMDg3Il0sWyJGaXJzdF9ZZWFyIiwiMTk5NyJdLFsiTGFzdF9ZZWFyIiwiMjAyNCJdLFsiU2NhbGUiLCItNiJdLFsiU2VyaWVzIiwiTSJdXX0=",
     "source": "BEA: NIPA tables",
     "table": "5.7.5BM1",
     "time_window": "1997-2025",

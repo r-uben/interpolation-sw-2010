@@ -4,7 +4,7 @@ Core FRED client implementation.
 import logging
 import pandas as pd
 from fredapi import Fred
-from src.interpolation_sw_2010.aws_manager.s3 import S3
+from interpolation_sw_2010.aws_manager.s3 import S3
 
 logger = logging.getLogger(__name__)
 

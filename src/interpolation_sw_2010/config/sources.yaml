@@ -1,0 +1,45 @@
+# BEA API configuration
+bea:
+  api_key: ${BEA_API_KEY}  # Will be replaced by environment variable
+
+# Data sources
+sources:
+  # BEA Table 5.7.5. Private Fixed Investment in Structures by Type
+  - name: bea_private_fixed_investment_structures
+    type: bea
+    description: "Private Fixed Investment in Structures by Type"
+    link: "https://apps.bea.gov/iTable/?reqid=19&step=2&isuri=1&categories=survey&nipa_table_list=5.7.5"
+    table: "5.7.5"
+    start_date: "1967-01-01"
+    end_date: "2025-12-31"
+    frequency: "A"  # Annual
+    
+  # BEA Table 1.1.5. Gross Domestic Product
+  - name: bea_gdp
+    type: bea
+    description: "Gross Domestic Product"
+    link: "https://apps.bea.gov/iTable/?reqid=19&step=2&isuri=1&categories=survey&nipa_table_list=1.1.5"
+    table: "1.1.5"
+    start_date: "1947-01-01"
+    end_date: "2025-12-31"
+    frequency: "Q"  # Quarterly
+    
+  # BEA Table 2.3.5. Personal Consumption Expenditures by Major Type of Product
+  - name: bea_personal_consumption
+    type: bea
+    description: "Personal Consumption Expenditures by Major Type of Product"
+    link: "https://apps.bea.gov/iTable/?reqid=19&step=2&isuri=1&categories=survey&nipa_table_list=2.3.5"
+    table: "2.3.5"
+    start_date: "1959-01-01"
+    end_date: "2025-12-31"
+    frequency: "M"  # Monthly
+    
+  # BEA Table 3.1. Government Current Receipts and Expenditures
+  - name: bea_government_receipts_expenditures
+    type: bea
+    description: "Government Current Receipts and Expenditures"
+    link: "https://apps.bea.gov/iTable/?reqid=19&step=2&isuri=1&categories=survey&nipa_table_list=3.1"
+    table: "3.1"
+    start_date: "1947-01-01"
+    end_date: "2025-12-31"
+    frequency: "Q"  # Quarterly 

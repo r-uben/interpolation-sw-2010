@@ -6,8 +6,8 @@ from typing import Optional
 import pandas as pd
 import json
 from datetime import datetime
-from src.interpolation_sw_2010.fred.core.fred_client import FREDClient
-from src.interpolation_sw_2010.aws_manager.bucket_manager import BucketManager
+from interpolation_sw_2010.fred.core.fred_client import FREDClient
+from interpolation_sw_2010.aws_manager.bucket_manager import BucketManager
 from pathlib import Path
 
 logger = logging.getLogger(__name__)

@@ -19,8 +19,15 @@ xlrd = "^2.0.1"
 requests = "^2.31.0"  # For API requests
 boto3 = "^1.34.0"  # For AWS services
 fredapi = "^0.5.1"  # For FRED API access
-beapy = "^0.2.4"
+# beaapi is installed directly from wheel file
 scipy = "^1.15.2"
+selenium = "^4.15.0"  # For web scraping
+beautifulsoup4 = "^4.12.0"  # For HTML parsing
+webdriver-manager = "^4.0.0"  # For managing webdriver
+lxml = "^4.9.0"  # For XML/HTML processing
+html5lib = "^1.1"  # For HTML parsing
+python-dotenv = "^1.0.0"  # For environment variables
+statsmodels = "^0.14.0"  # For statistical models
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.3.1"
@@ -39,6 +46,7 @@ build-backend = "poetry.core.masonry.api"
 sw2010-gdp-interpolator = "mains.sw2010_gdp_interpolator:main"
 sw2010-fetch-data = "mains.fetch_all_sw_data:main"
 sw2010-update-raw-data = "mains.sw2010_update_raw_data:main"
+sw2010-bea-fetcher = "interpolation_sw_2010.cli:main"  # Add CLI entry point for BEA data fetcher
 
 [tool.black]
 line-length = 88

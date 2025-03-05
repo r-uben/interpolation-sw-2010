@@ -1,0 +1,41 @@
+{
+  "full_url": "https://apps.bea.gov/iTable/?reqid=19&step=3&isuri=1&nipa_table_list=164&categories=survey#eyJhcH                  BpZCI6MTksInN0ZXBzIjpbMSwyLDMsM10sImRhdGEiOltbImNhdGVnb3JpZXMiLCJVbmRlcmx5aW5nIl0sWyJOSVBBX1RhYmxlX0xpc3QiLCIyMDg3Il0sWyJGaXJzdF9ZZWFyIiwiMTk5NyJdLFsiTGFzdF9ZZWFyIiwiMjAyNCJdLFsiU2NhbGUiLCItNiJdLFsiU2VyaWVzIiwiTSJdXX0=",
+  "base_url": "https://apps.bea.gov/iTable/?reqid=19&step=3&isuri=1&nipa_table_list=164&categories=survey",
+  "hash_params": "eyJhcH                  BpZCI6MTksInN0ZXBzIjpbMSwyLDMsM10sImRhdGEiOltbImNhdGVnb3JpZXMiLCJVbmRlcmx5aW5nIl0sWyJOSVBBX1RhYmxlX0xpc3QiLCIyMDg3Il0sWyJGaXJzdF9ZZWFyIiwiMTk5NyJdLFsiTGFzdF9ZZWFyIiwiMjAyNCJdLFsiU2NhbGUiLCItNiJdLFsiU2VyaWVzIiwiTSJdXX0=",
+  "table_id": "5.7.5BM1",
+  "decoded_params": {
+    "appid": 19,
+    "steps": [
+      1,
+      2,
+      3,
+      3
+    ],
+    "data": [
+      [
+        "categories",
+        "Underlying"
+      ],
+      [
+        "NIPA_Table_List",
+        "2087"
+      ],
+      [
+        "First_Year",
+        "1997"
+      ],
+      [
+        "Last_Year",
+        "2024"
+      ],
+      [
+        "Scale",
+        "-6"
+      ],
+      [
+        "Series",
+        "M"
+      ]
+    ]
+  }
+}

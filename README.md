@@ -8,6 +8,7 @@ This package implements the Stock-Watson (2010) procedure for temporal disaggreg
 - Apply cubic spline and linear interpolation methods
 - Implement the Stock-Watson (2010) Kalman filter interpolation method
 - Generate comparison visualizations between quarterly and monthly data
+- Fetch data directly from BEA (Bureau of Economic Analysis) using web scraping or API
 - Configurable via YAML configuration files
 - Comprehensive data validation
 - Progress tracking and logging
@@ -35,9 +36,20 @@ cd interpolation-sw-2010
 poetry install
 ```
 
+4. (Optional) Set up environment variables:
+
+Copy the example environment file and add your API keys:
+
+```bash
+cp .env.example .env
+# Edit .env to add your BEA API key
+```
+
 ## Usage
 
-The package provides a command-line interface for interpolating quarterly GDP data to monthly frequency:
+The package provides several command-line interfaces:
+
+### GDP Interpolation
 
 ```bash
 # Activate the poetry environment
@@ -48,6 +60,16 @@ poetry run sw2010-gdp-interpolator
 
 # Or directly from the script
 poetry run python mains/sw2010_gdp_interpolator.py
+```
+
+### Data Fetching
+
+```bash
+# List available BEA data sources
+poetry run sw2010-bea-fetcher list-sources
+
+# Fetch data from a specific BEA source
+poetry run sw2010-bea-fetcher fetch bea_gdp --output output/gdp_data.csv
 ```
 
 ### Interpolation Methods
@@ -64,6 +86,8 @@ The input data should be in Excel format with the following structure:
 
 - Quarterly sheet with GDP components (PCE, I_NS, I_ES, I_RS, I_chPI, X, IM, G, PGDP)
 - Monthly sheet with related monthly indicators
+
+Alternatively, you can fetch data directly from BEA using the built-in data fetcher.
 
 ### Output
 
@@ -84,12 +108,23 @@ The Stock-Watson method for interpolating quarterly GDP to monthly frequency inv
 3. Ensuring that the sum of three monthly values equals the quarterly value
 4. Applying a state-space model and Kalman filter for optimal interpolation
 
+### BEA Data Fetcher
+
+The BEA data fetcher provides two methods for retrieving data:
+
+1. **Web Scraping**: Uses Selenium to navigate to the BEA website, wait for the table to load, and extract the data.
+2. **Direct API Access**: Uses the BEA API to directly request the data using the table ID.
+
+For more details, see [README_BEA_DATA_FETCHER.md](README_BEA_DATA_FETCHER.md).
+
 ### Key Components
 
 - `sw2010_gdp_interpolator.py`: Main script for interpolation
 - `sw2010_interpolator.py`: Implementation of the Stock-Watson interpolation method
 - `visualization.py`: Tools for generating comparison plots
 - `spline_detrending.py`: Implementation of cubic spline detrending
+- `data_fetcher.py`: Tools for fetching data from various sources
+- `bea/`: Module for interacting with BEA data
 
 ## References
 
