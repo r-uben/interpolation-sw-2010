@@ -30,11 +30,52 @@ class Visualization:
         # Get configuration
         self.config = config or Config().get('visualization', {})
         self._configure_matplotlib()
+        
+        # Define units for each component
+        self.component_units = {
+            'PCE': 'Billions of Dollars',
+            'I_NS': 'Billions of Dollars',
+            'I_ES': 'Billions of Dollars',
+            'I_RS': 'Billions of Dollars',
+            'I_chPI': 'Billions of Dollars',
+            'X': 'Billions of Dollars',
+            'IM': 'Billions of Dollars',
+            'G': 'Billions of Dollars',
+            'PGDP': 'Index (2017=100)',
+            'GDP_nominal': 'Billions of Dollars',
+            'GDP_real': 'Billions of 2017 Dollars'
+        }
     
     def _configure_matplotlib(self):
         """Configure matplotlib based on settings."""
-        plt.rcParams.update(self.config.get('matplotlib', {}))
-        sns.set(style=self.config.get('seaborn_style', "whitegrid"))
+        # Set up Latin Modern Roman font with larger text sizes
+        plt.rcParams.update({
+            'font.family': 'serif',
+            'font.serif': ['Latin Modern Roman'],
+            'mathtext.fontset': 'cm',
+            'axes.titlesize': 18,
+            'axes.labelsize': 15,
+            'xtick.labelsize': 14,
+            'ytick.labelsize': 14,
+            'legend.fontsize': 15,
+            'figure.constrained_layout.use': False,
+            'figure.autolayout': False,
+            # Configure default spine visibility
+            'axes.spines.top': False,
+            'axes.spines.right': False,
+            'axes.spines.left': True,
+            'axes.spines.bottom': True
+        })
+        sns.set_style("whitegrid", {
+            'grid.linestyle': ':',
+            'grid.alpha': 0.3,
+            'axes.facecolor': 'white',
+            'axes.grid': True,
+            'axes.spines.left': True,
+            'axes.spines.bottom': True,
+            'axes.spines.right': False,
+            'axes.spines.top': False
+        })
     
     def create_correlation_heatmap(self, df: pd.DataFrame, title: str = 'Correlation Matrix') -> Path:
         """
@@ -303,38 +344,54 @@ class Visualization:
                 # Create a figure with a main plot and an inset zoom
                 fig, ax = plt.subplots(figsize=self.config['figure_sizes'].get('comparison', (14, 8)))
                 
-                # Set a nice style
-                plt.style.use('seaborn-v0_8-whitegrid')
+                # Set up the plot style with more vertical space
+                plt.subplots_adjust(bottom=0.2, top=0.9)  # Increased bottom margin for footnote
                 
                 # First plot quarterly data as points WITHOUT connecting lines (in the background)
                 ax.plot(quarterly_df.index, quarterly_df[component], 
                        marker='o', 
                        linestyle='', 
                        linewidth=0,
-                       markersize=6, 
+                       markersize=4,  # Increased from 6
                        label=f'Quarterly (Original)', 
                        color='#d62728',
                        markeredgecolor='black',
                        markeredgewidth=0.5,
-                       alpha=0.7,  # Make it slightly transparent
-                       zorder=1)   # Lower zorder so it's behind the monthly data
+                       alpha=0.7,
+                       zorder=2)
                 
                 # Then plot monthly data as a prominent line (on top)
                 ax.plot(monthly_df.index, monthly_df[component],
                        label=f'Monthly (Interpolated)', 
-                       linewidth=2.5, 
+                       linewidth=3.0,  # Increased from 2.5
                        color='#1f77b4',
                        linestyle='-',
-                       alpha=1.0,   # Full opacity
-                       zorder=2)    # Higher zorder so it's on top
+                       alpha=1.0,
+                       zorder=1)
                 
-                # Add title and labels
+                # Add title and labels with Latin Modern Roman font
                 ax.set_title(f'Stock-Watson (2010) Interpolation: {component}', 
-                            fontsize=14, fontweight='bold')
-                ax.set_xlabel('Date', fontsize=12)
-                ax.set_ylabel('Value', fontsize=12)
-                ax.legend(loc='best', fontsize=10)
-                ax.grid(True, alpha=0.3)
+                            fontsize=21, fontweight='bold', pad=20)  # Increased from 14
+                ax.set_xlabel('')
+                unit = self.component_units.get(component, 'Value')
+                ax.set_ylabel(unit, fontsize=18, labelpad=10)  # Increased from 12
+                
+                # Customize grid and spines
+                ax.grid(True, linestyle=':', alpha=0.3)
+                # Set spine visibility and style
+                ax.spines['top'].set_visible(False)
+                ax.spines['right'].set_visible(False)
+                ax.spines['left'].set_visible(True)
+                ax.spines['bottom'].set_visible(True)
+                ax.spines['left'].set_linewidth(0.5)
+                ax.spines['bottom'].set_linewidth(0.5)
+                
+                # Customize legend with larger font
+                ax.legend(loc='best', fontsize=15, framealpha=0.9, edgecolor='none')  # Increased from 10
+                
+                # Adjust tick parameters for better spacing
+                ax.tick_params(axis='both', which='major', pad=8, labelsize=14)  # Increased labelsize
+                ax.tick_params(axis='x', rotation=0)
                 
                 # Add a zoom inset showing recent years (if data extends past 2000)
                 try:
@@ -348,31 +405,41 @@ class Visualization:
                         
                         # Plot the recent data in the inset
                         axins.plot(recent_quarterly.index, recent_quarterly[component], 
-                                marker='o', markersize=4, linestyle='', 
+                                marker='o', markersize=5, linestyle='',  # Increased from 4
                                 color='#d62728', alpha=0.7, linewidth=0)
                         axins.plot(recent_monthly.index, recent_monthly[component], 
-                                linewidth=2.0, color='#1f77b4')
+                                linewidth=2.5, color='#1f77b4')  # Increased from 2.0
                         
-                        # Set title and style for inset
-                        axins.set_title('Zoom: 2000-Present', fontsize=9)
-                        axins.tick_params(labelsize=8)
+                        # Set title and style for inset with larger font
+                        axins.set_title('Zoom: 2000-Present', fontsize=14)  # Increased from 9
+                        axins.tick_params(labelsize=12)  # Increased from 8
                         axins.grid(alpha=0.2)
                         
                         # Indicate the zoomed region with a box
                         ax.indicate_inset_zoom(axins, edgecolor="black", alpha=0.5)
+                        
+                        # Also update the zoom inset spines if it exists
+                        axins.spines['top'].set_visible(False)
+                        axins.spines['right'].set_visible(False)
+                        axins.spines['left'].set_visible(True)
+                        axins.spines['bottom'].set_visible(True)
+                        axins.spines['left'].set_linewidth(0.5)
+                        axins.spines['bottom'].set_linewidth(0.5)
                 except Exception as e:
                     logger.warning(f"Could not create zoom inset: {e}")
                 
-                # Add a footnote
-                plt.figtext(0.99, 0.01, 'Source: Stock-Watson (2010) GDP Interpolation', 
-                           horizontalalignment='right', fontsize=8, fontstyle='italic')
+                # Add a footnote with source and author - moved below the x-axis
+                plt.figtext(0.99, 0.02,  # Keep y position at 0.02 for below x-axis
+                          'Source: Stock-Watson (2010) GDP Interpolation | Author: Ruben Fernandez-Fuertes', 
+                          horizontalalignment='right', 
+                          fontsize=12,  # Increased from 8
+                          fontstyle='italic',
+                          family='Latin Modern Roman')
                 
-                plt.tight_layout()
-                
-                # Save the plot
+                # Save the plot with higher DPI for better quality and more padding
                 output_path = self.output_dir / f'comparison_{component}.png'
                 logger.info(f"Saving plot to {output_path}")
-                plt.savefig(output_path, dpi=self.config.get('dpi', 300))
+                plt.savefig(output_path, dpi=300, bbox_inches='tight', pad_inches=0.3)  # Increased padding
                 plt.close()
                 
                 plot_paths[component] = output_path

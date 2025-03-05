@@ -8,10 +8,18 @@ This package implements the Stock-Watson (2010) procedure for temporal disaggreg
 - Apply cubic spline and linear interpolation methods
 - Implement the Stock-Watson (2010) Kalman filter interpolation method
 - Generate comparison visualizations between quarterly and monthly data
-- Fetch data directly from BEA (Bureau of Economic Analysis) using web scraping or API
+- Fetch data directly from FRED and BEA (Bureau of Economic Analysis) using web scraping or API
 - Configurable via YAML configuration files
-- Comprehensive data validation
+- Comprehensive data validation and quality metrics
 - Progress tracking and logging
+- Automated data update workflow
+
+## Requirements
+
+- Python 3.8+
+- Poetry (dependency management)
+- Internet connection (for data fetching features)
+- BEA API key (for accessing BEA data)
 
 ## Installation
 
@@ -36,7 +44,7 @@ cd interpolation-sw-2010
 poetry install
 ```
 
-4. (Optional) Set up environment variables:
+4. Set up environment variables:
 
 Copy the example environment file and add your API keys:
 
@@ -58,27 +66,64 @@ poetry shell
 # Run the Stock-Watson GDP interpolator
 poetry run sw2010-gdp-interpolator
 
-# Or directly from the script
-poetry run python mains/sw2010_gdp_interpolator.py
+# With specific options
+poetry run sw2010-gdp-interpolator --data-path custom/path/to/data.xlsx --output custom/output/path.csv
 ```
 
 ### Data Fetching
 
 ```bash
-# List available BEA data sources
-poetry run sw2010-bea-fetcher list-sources
+# Update raw data from all sources
+poetry run sw2010-update-raw-data --all --final
 
-# Fetch data from a specific BEA source
-poetry run sw2010-bea-fetcher fetch bea_gdp --output output/gdp_data.csv
+# Fetch only FRED data
+poetry run sw2010-update-raw-data --fred
+
+# Fetch only BEA data
+poetry run sw2010-update-raw-data --bea
+
+# Fetch specific frequency data
+poetry run sw2010-update-raw-data --quarterly
+poetry run sw2010-update-raw-data --monthly
+```
+
+### Configuration
+
+The application uses YAML configuration files located in `src/interpolation_sw_2010/config/`:
+
+- `sources.yaml`: Defines data sources and their parameters
+- `config.yaml`: General application configuration
+
+Example of `sources.yaml` structure:
+```yaml
+sources:
+  - name: gdp
+    type: bea
+    table_id: T10101
+    description: "Gross Domestic Product"
+    frequency: quarterly
+  - name: ip
+    type: fred
+    series_id: "INDPRO"
+    description: "Industrial Production Index"
+    frequency: monthly
 ```
 
 ### Interpolation Methods
 
 The package supports multiple interpolation methods:
 
-1. **Cubic Spline Interpolation**: Uses scipy's cubic spline interpolation to generate monthly values from quarterly data.
+1. **Cubic Spline Interpolation**: Uses scipy's cubic spline interpolation to generate monthly values from quarterly data. Implemented in `SplineDetrending` class.
+
 2. **Linear Interpolation**: Uses linear interpolation between quarterly data points.
-3. **Kalman Filter Interpolation**: Implements the Stock-Watson (2010) approach using a state-space model and Kalman filter.
+
+3. **Kalman Filter Interpolation**: Implements the Stock-Watson (2010) approach using a state-space model and Kalman filter. This is the primary method and is implemented in the `KalmanFilter` class.
+
+The implementation follows the procedure described in Stock and Watson (2010), which:
+- Places quarterly values at the middle month of each quarter
+- Uses related monthly indicators to guide the interpolation
+- Ensures that the sum of three monthly values equals the quarterly value
+- Applies a state-space model and Kalman filter for optimal interpolation
 
 ### Data Requirements
 
@@ -87,7 +132,7 @@ The input data should be in Excel format with the following structure:
 - Quarterly sheet with GDP components (PCE, I_NS, I_ES, I_RS, I_chPI, X, IM, G, PGDP)
 - Monthly sheet with related monthly indicators
 
-Alternatively, you can fetch data directly from BEA using the built-in data fetcher.
+Alternatively, you can fetch data directly from FRED and BEA using the built-in data fetchers.
 
 ### Output
 
@@ -97,38 +142,47 @@ The script generates:
 2. Comparison plots for each GDP component showing quarterly vs. monthly values
 3. A time series plot of the interpolated monthly GDP
 
+## Troubleshooting
+
+### Common Issues
+
+1. **Missing or invalid BEA API key**: Ensure your BEA API key is valid and set correctly in the .env file
+2. **Data fetching failures**: Check your internet connection; BEA and FRED websites occasionally change their structure
+3. **Interpolation errors**: Ensure your data has sufficient coverage and no extreme outliers
+
+### Performance Considerations
+
+- The Kalman filter optimization can be computationally intensive for large datasets
+- For very large datasets, consider increasing the RAM allocation to Python
+
 ## Implementation Details
 
-### Stock-Watson (2010) Method
+### Core Components
 
-The Stock-Watson method for interpolating quarterly GDP to monthly frequency involves:
-
-1. Placing quarterly values at the middle month of each quarter
-2. Using related monthly indicators to guide the interpolation
-3. Ensuring that the sum of three monthly values equals the quarterly value
-4. Applying a state-space model and Kalman filter for optimal interpolation
+- `sw2010_interpolator.py`: Main implementation of the Stock-Watson interpolation method
+- `core/kalman_filter.py`: Implementation of the Kalman filter for temporal disaggregation
+- `core/spline_detrending.py`: Cubic spline detrending implementation
+- `core/regressors.py`: Handles regression analysis for indicators
+- `core/data_manager.py`: Manages data loading, validation, and transformation
+- `core/kalman_optimization.py`: Optimizes Kalman filter parameters
+- `utils/visualization.py`: Generates comparison plots and visualizations
 
 ### BEA Data Fetcher
 
 The BEA data fetcher provides two methods for retrieving data:
 
-1. **Web Scraping**: Uses Selenium to navigate to the BEA website, wait for the table to load, and extract the data.
+1. **Web Scraping**: Uses requests and BeautifulSoup to navigate to the BEA website, extract table structures, and parse the data.
 2. **Direct API Access**: Uses the BEA API to directly request the data using the table ID.
-
-For more details, see [README_BEA_DATA_FETCHER.md](README_BEA_DATA_FETCHER.md).
-
-### Key Components
-
-- `sw2010_gdp_interpolator.py`: Main script for interpolation
-- `sw2010_interpolator.py`: Implementation of the Stock-Watson interpolation method
-- `visualization.py`: Tools for generating comparison plots
-- `spline_detrending.py`: Implementation of cubic spline detrending
-- `data_fetcher.py`: Tools for fetching data from various sources
-- `bea/`: Module for interacting with BEA data
 
 ## References
 
-Stock, J. H., & Watson, M. W. (2010). Distribution of quarterly GDP growth rates.
+Stock, J. H., & Watson, M. W. (2010). "Distribution of quarterly GDP growth rates," NBER Working Paper No. 15862.
+
+Chow, G. C., & Lin, A. L. (1971). "Best linear unbiased interpolation, distribution, and extrapolation of time series by related series," The Review of Economics and Statistics, 53(4), 372-375.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
